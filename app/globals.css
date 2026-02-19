@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Outfit", sans-serif;
+  color: #141b2d;
+  background: #fafaf7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Terms page prose */
+.prose-custom h3 {
+  font-family: "Outfit", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #141b2d;
+  margin-top: 28px;
+  margin-bottom: 10px;
+}
+
+.prose-custom h3:first-child {
+  margin-top: 0;
+}
+
+.prose-custom p {
+  font-family: "Outfit", sans-serif;
+  font-size: 14px;
+  color: #3a4260;
+  line-height: 1.8;
+  margin-bottom: 10px;
+}
+
+.prose-custom a {
+  color: #1a4fa0;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.prose-custom a:hover {
+  text-decoration: underline;
+}

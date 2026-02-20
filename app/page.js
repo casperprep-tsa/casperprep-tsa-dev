@@ -37,11 +37,11 @@ export default function HomePage() {
                 Everything you need to stop guessing and start scoring.
               </p>
 
-              <div className="flex gap-3 justify-center lg:justify-start flex-wrap mb-4">
-                <Btn variant="primary" size="lg" href="/checkout?plan=full" className="min-w-[280px] text-center">
+              <div className="flex flex-col gap-3 items-center lg:items-start mb-4 w-full max-w-[400px] mx-auto lg:mx-0">
+                <Btn variant="primary" size="lg" href="/checkout?plan=full" full>
                   Enroll Now — From ${PLANS.question_bank.price} CAD
                 </Btn>
-                <Btn variant="secondary" size="lg" href="/course" className="min-w-[280px] text-center">
+                <Btn variant="secondary" size="lg" href="/course" full>
                   Preview the Course
                 </Btn>
               </div>

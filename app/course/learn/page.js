@@ -1162,8 +1162,20 @@ export default function CourseLearnPage() {
   var hasAnyAccess = hasStrategy || hasQuestionBank;
 
   function canAccessModule(modNum) {
-    /* Module 4 (video tutorials) is free for all signed-up users */
+    /* Module 4 is partially free (lesson 3 only) — allow entering the module */
     if (modNum === 4) return true;
+    if (hasStrategy && hasQuestionBank) return true;
+    if (modNum <= 5) return hasStrategy;
+    if (modNum >= 6) return hasQuestionBank;
+    return false;
+  }
+
+  function canAccessLesson(modNum, lessonNum) {
+    /* Module 4, Lesson 3 is free for all signed-up users */
+    if (modNum === 4 && lessonNum === 3) return true;
+    /* All other Module 4 lessons require Strategy access */
+    if (modNum === 4) return hasStrategy;
+    /* Other modules follow normal tier gating */
     if (hasStrategy && hasQuestionBank) return true;
     if (modNum <= 5) return hasStrategy;
     if (modNum >= 6) return hasQuestionBank;
@@ -1179,7 +1191,7 @@ export default function CourseLearnPage() {
           <p className="font-body text-sm text-ink-muted mb-6">Choose a plan to start your CASPer preparation.</p>
           <Btn variant="primary" size="md" href="/checkout?plan=full">Get Full Course — $215 CAD</Btn>
           <div className="mt-4 flex flex-col gap-2">
-            <Link href="/course" className="text-sm text-brand-blue font-body font-semibold no-underline hover:underline">Preview free content — Video Tutorials →</Link>
+            <Link href="/course/learn?m=4&l=3" className="text-sm text-brand-blue font-body font-semibold no-underline hover:underline">Preview free content — Video Tutorial →</Link>
             <Link href="/#pricing" className="text-sm text-ink-muted font-body no-underline hover:underline">View all plans</Link>
           </div>
         </div>
@@ -1206,7 +1218,7 @@ export default function CourseLearnPage() {
             Get {needsLabel} — ${needsPrice} CAD
           </Btn>
           <div className="mt-4 flex flex-col gap-2">
-            <Link href="/course" className="text-sm text-brand-blue font-body font-semibold no-underline hover:underline">Preview free content — Video Tutorials →</Link>
+            <Link href="/course/learn?m=4&l=3" className="text-sm text-brand-blue font-body font-semibold no-underline hover:underline">Preview free content — Video Tutorial →</Link>
             <Link href="/dashboard" className="text-sm text-ink-muted font-body no-underline hover:underline">← Back to Dashboard</Link>
           </div>
         </div>
@@ -1265,16 +1277,17 @@ export default function CourseLearnPage() {
                       {mod.lessons.map(function (les) {
                         var isComplete = completedLessons.has(mod.num + "-" + les.num);
                         var isActive = activeModule === mod.num && activeLesson === les.num;
+                        var isLessonLocked = !canAccessLesson(mod.num, les.num);
                         return (
                           <button
                             key={les.num}
                             onClick={function () { setActiveLesson(les.num); setSidebarOpen(false); }}
-                            className={"w-full text-left flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-body transition-colors " + (isActive ? "bg-brand-orange-light text-ink font-semibold" : "text-ink-soft hover:bg-gray-50")}
+                            className={"w-full text-left flex items-center gap-2 px-3 py-1.5 rounded-md text-[13px] font-body transition-colors " + (isActive ? "bg-brand-orange-light text-ink font-semibold" : isLessonLocked ? "text-ink-muted opacity-60 hover:bg-gray-50" : "text-ink-soft hover:bg-gray-50")}
                           >
-                            <div className={"w-4 h-4 rounded-full flex items-center justify-center shrink-0 " + (isComplete ? "bg-green-500" : isActive ? "bg-brand-orange" : "bg-surface-border")}>
-                              {isComplete && <IconCheck size={10} className="text-white" />}
+                            <div className={"w-4 h-4 rounded-full flex items-center justify-center shrink-0 " + (isLessonLocked ? "bg-surface-border" : isComplete ? "bg-green-500" : isActive ? "bg-brand-orange" : "bg-surface-border")}>
+                              {isLessonLocked ? <IconLock size={8} className="text-ink-muted" /> : isComplete ? <IconCheck size={10} className="text-white" /> : null}
                             </div>
-                            <span className="truncate">{les.title}</span>
+                            <span className="truncate">{les.title}{isLessonLocked ? "" : ""}</span>
                           </button>
                         );
                       })}
@@ -1293,6 +1306,33 @@ export default function CourseLearnPage() {
         {/* Main content */}
         <main className="flex-1 min-w-0 px-6 py-8 md:px-10 md:py-10">
           <div className="max-w-[720px] mx-auto">
+
+            {/* Lesson-level lock check (e.g. Module 4 Tutorials 1 & 2 are locked) */}
+            {!canAccessLesson(activeModule, activeLesson) ? (
+              <div className="text-center py-20">
+                <IconLock size={40} className="text-brand-orange mx-auto mb-4" />
+                <h2 className="font-display text-xl font-bold text-ink mb-3">
+                  {currentLesson ? currentLesson.title : "Lesson"} is Locked
+                </h2>
+                <p className="font-body text-sm text-ink-muted mb-6 max-w-md mx-auto">
+                  This tutorial is part of the Strategy Course. Unlock all expert video tutorials, frameworks, and the ideas bank.
+                </p>
+                <Btn variant="primary" size="md" href="/checkout?plan=strategy">
+                  Get Strategy Course — $149 CAD
+                </Btn>
+                <div className="mt-3">
+                  <Btn variant="secondary" size="sm" href="/checkout?plan=full">
+                    Or get the Full Course — $215 CAD
+                  </Btn>
+                </div>
+                <div className="mt-4">
+                  <button onClick={function () { setActiveLesson(3); }} className="text-sm text-brand-blue font-body font-semibold hover:underline cursor-pointer bg-transparent border-none">
+                    Watch Tutorial 3 for free →
+                  </button>
+                </div>
+              </div>
+            ) : (
+            <>
 
             {currentLesson && currentLesson.image && (
               <div className="mb-6 rounded-xl overflow-hidden border border-surface-border">
@@ -1365,9 +1405,13 @@ export default function CourseLearnPage() {
                 </div>
               )}
             </div>
+            </>
+            )}
           </div>
         </main>
       </div>
     </div>
   );
 }
+
+

@@ -68,7 +68,7 @@ export default function CoursePage() {
         <div className="max-w-[1000px] mx-auto">
           <div className="flex items-center gap-2.5 mb-4">
             <Badge variant="orange">Version 2.0</Badge>
-            <Badge variant="blue">Free Preview</Badge>
+            <Badge variant="blue">1 Free Tutorial</Badge>
           </div>
           <h1 className="font-display text-[30px] md:text-[32px] font-bold text-white leading-tight mb-2">
             CASPer Expert Strategy Course
@@ -113,7 +113,7 @@ export default function CoursePage() {
                     </p>
                     <p className="text-[11px] text-ink-muted font-body">
                       {isFree ? (
-                        <span className="text-green-600 font-semibold">Free Preview</span>
+                        <span className="text-green-600 font-semibold">1 Free Tutorial</span>
                       ) : (
                         "Locked"
                       )}
@@ -146,7 +146,7 @@ export default function CoursePage() {
                       Expert-Led Video Analysis Tutorials
                     </h2>
                     <p className="text-[12px] text-ink-muted font-body">
-                      Module 4 &middot; 3 Sessions &middot; Free Preview
+                      Module 4 &middot; 3 Sessions &middot; 1 Free Preview
                     </p>
                   </div>
                 </div>
@@ -157,24 +157,42 @@ export default function CoursePage() {
                 </p>
 
                 {TUTORIALS.map(function (tut, i) {
+                  var isFree = tut.num === 3;
                   return (
                     <div key={tut.num} className={i < TUTORIALS.length - 1 ? "mb-9" : ""}>
                       <div className="flex items-center gap-2.5 mb-2.5">
-                        <div className="w-7 h-7 rounded-md bg-brand-orange-light flex items-center justify-center font-body font-bold text-brand-orange-dark text-[13px]">
-                          {tut.num}
+                        <div className={"w-7 h-7 rounded-md flex items-center justify-center font-body font-bold text-[13px] " + (isFree ? "bg-brand-orange-light text-brand-orange-dark" : "bg-gray-100 text-ink-muted")}>
+                          {isFree ? tut.num : <IconLock size={12} className="text-ink-muted" />}
                         </div>
-                        <h3 className="font-body text-base font-semibold text-ink">
-                          Tutorial {tut.num}: {tut.title}
-                        </h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className={"font-body text-base font-semibold " + (isFree ? "text-ink" : "text-ink-muted")}>
+                            Tutorial {tut.num}: {tut.title}
+                          </h3>
+                          {isFree && (
+                            <span className="text-[10px] font-bold font-body text-green-600 bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-wide">Free</span>
+                          )}
+                          {!isFree && (
+                            <span className="text-[10px] font-bold font-body text-ink-muted bg-gray-100 px-2 py-0.5 rounded-full uppercase tracking-wide">Locked</span>
+                          )}
+                        </div>
                       </div>
-                      <p className="font-body text-[13px] text-ink-muted leading-relaxed mb-3.5">
+                      <p className={"font-body text-[13px] leading-relaxed mb-3.5 " + (isFree ? "text-ink-muted" : "text-ink-muted/60")}>
                         {tut.desc}
                       </p>
-                      <VideoThumbnail
-                        title={tut.title}
-                        videoId={tut.videoId}
-                        subtitle={"Tutorial " + tut.num}
-                      />
+                      {isFree ? (
+                        <VideoThumbnail
+                          title={tut.title}
+                          videoId={tut.videoId}
+                          subtitle={"Tutorial " + tut.num}
+                        />
+                      ) : (
+                        <div className="bg-gray-50 rounded-xl border border-surface-border p-8 text-center">
+                          <IconLock size={24} className="text-ink-muted mx-auto mb-2" />
+                          <p className="font-body text-[13px] text-ink-muted">
+                            Unlock with the Strategy Course or Full Course
+                          </p>
+                        </div>
+                      )}
                       {i < TUTORIALS.length - 1 && (
                         <div className="h-px bg-surface-border mt-7" />
                       )}

@@ -93,11 +93,14 @@ export default function TermsPage() {
             {/* ── 4 ── */}
             <h3>4. Payment &amp; Pricing</h3>
             <p>
-              The Course is offered at a one-time payment of{" "}
-              <strong>${SITE.priceCAD} CAD</strong>. This is not a subscription and there
-              are no recurring charges. All prices are listed in Canadian Dollars (CAD) and
-              may be subject to applicable taxes. Currency conversion for international
-              purchases is handled by your payment provider.
+              The Course is offered in multiple tiers: the Strategy Course
+              (Modules 1–5), the Question Bank (Modules 6–7), and the Full
+              Course (All 7 Modules). Pricing is listed on our website and may
+              be updated from time to time. All purchases are one-time payments
+              — there are no subscriptions or recurring charges. Prices are
+              listed in Canadian Dollars (CAD) and may be subject to applicable
+              taxes. Currency conversion for international purchases is handled
+              by your payment provider.
             </p>
 
             {/* ── 5 ── */}

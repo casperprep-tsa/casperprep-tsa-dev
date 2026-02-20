@@ -1,51 +1,47 @@
 "use client";
 
 import { useState } from "react";
+import { Btn } from "@/components/ui/Primitives";
+import { createClient } from "@/lib/supabase/client";
 
-export default function EnrollButton() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+export default function EnrollButton({ plan = "full", label, className }) {
+  var ref = useState(false);
+  var loading = ref[0], setLoading = ref[1];
 
-  async function handleEnroll() {
+  async function handleClick() {
     setLoading(true);
-    setError("");
-
     try {
-      const res = await fetch("/api/checkout", {
+      var supabase = createClient();
+      var result = await supabase.auth.getUser();
+      var email = result.data?.user?.email || undefined;
+
+      var res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: plan, email: email }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Something went wrong.");
-        setLoading(false);
-        return;
+      var data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Something went wrong. Please try again or contact support.");
       }
-
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
     } catch (err) {
-      setError("Something went wrong. Please try again.");
-      setLoading(false);
+      alert("Something went wrong. Please try again.");
     }
+    setLoading(false);
   }
 
   return (
-    <div>
-      <button
-        onClick={handleEnroll}
-        disabled={loading}
-        className="w-full py-3.5 rounded-lg bg-brand-orange text-white font-body font-semibold text-[16px] hover:brightness-110 transition-all disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer border-none"
-      >
-        {loading ? "Redirecting to checkout..." : "Enroll Now — $249 CAD"}
-      </button>
-      {error && (
-        <p className="text-sm text-red-600 font-body text-center mt-3">
-          {error}
-        </p>
-      )}
-    </div>
+    <Btn
+      variant="primary"
+      size="lg"
+      full
+      onClick={handleClick}
+      className={className}
+    >
+      {loading ? "Loading..." : label || "Enroll Now"}
+    </Btn>
   );
 }

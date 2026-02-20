@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { MODULES, TESTIMONIALS, SITE } from "@/lib/constants";
+import { MODULES, TESTIMONIALS, SITE, PLANS } from "@/lib/constants";
 import { Badge, Btn, SectionLabel, Stars } from "@/components/ui/Primitives";
 import { IconCheck, IconShield, IconTarget, IconVideo, IconBook, IconPen, IconUsers, IconMail } from "@/components/Icons";
 
 export const metadata = {
   title: { absolute: "CASPer Prep by TSA | Expert Strategy Course v2.0" },
-  description: "Stop guessing. Start scoring in the top quartile. 7 modules, expert video tutorials, 40+ high-impact ideas, and practice scenarios with sample answers. $249 CAD one-time.",
+  description: "Stop guessing. Start scoring in the top quartile. 7 modules, expert video tutorials, 40+ high-impact ideas, and practice scenarios with sample answers. Plans from $100 CAD.",
 };
 
 export default function HomePage() {
@@ -38,8 +38,8 @@ export default function HomePage() {
               </p>
 
               <div className="flex gap-3 justify-center lg:justify-start flex-wrap mb-4">
-                <Btn variant="primary" size="lg" href="/checkout">
-                  Enroll Now — ${SITE.priceCAD} CAD
+                <Btn variant="primary" size="lg" href="/checkout?plan=full">
+                  Enroll Now — From ${PLANS.question_bank.price} CAD
                 </Btn>
                 <Btn variant="secondary" size="lg" href="/course">
                   Preview the Course
@@ -47,7 +47,7 @@ export default function HomePage() {
               </div>
 
               <p className="text-[12px] text-white/30 font-body">
-                One-time payment &middot; 6 months access &middot; No subscriptions
+                Plans from ${PLANS.question_bank.price} CAD &middot; 6 months access &middot; No subscriptions
               </p>
             </div>
 
@@ -267,81 +267,122 @@ export default function HomePage() {
 
       {/* ═══ PRICING ═══ */}
       <section className="bg-surface-cream py-20 px-6">
-        <div className="max-w-[860px] mx-auto">
+        <div className="max-w-[1080px] mx-auto">
           <div className="text-center mb-11">
             <SectionLabel>Pricing</SectionLabel>
             <h2 className="font-display text-[28px] md:text-[32px] font-bold text-ink">
               Invest in Your Score
             </h2>
+            <p className="font-body text-[15px] text-ink-muted mt-2">Choose the plan that fits your preparation needs</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-[760px] mx-auto">
-            {/* Course */}
-            <div className="bg-white rounded-2xl p-7 md:p-8 border-2 border-brand-orange relative flex flex-col">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-br from-brand-orange to-brand-orange-dark text-white px-4 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase font-body whitespace-nowrap">
-                Most Popular
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* ── Strategy Course ── */}
+            <div className="bg-white rounded-2xl p-6 border border-surface-border flex flex-col">
+              <h3 className="font-display text-lg font-bold text-ink mb-0.5">{PLANS.strategy.name}</h3>
+              <p className="font-body text-[12px] text-ink-muted mb-4">{PLANS.strategy.subtitle}</p>
+              <div className="mb-5">
+                <span className="font-display text-[36px] font-bold text-ink">${PLANS.strategy.price}</span>
+                <span className="text-sm text-ink-muted font-body"> CAD</span>
+                <p className="text-[11px] text-ink-muted font-body mt-1">One-time payment</p>
               </div>
-              <h3 className="font-display text-xl font-bold text-ink mb-1">Complete Course</h3>
-              <p className="font-body text-[13px] text-ink-muted mb-5">
-                Full 7-module self-paced program
-              </p>
-              <div className="mb-6">
-                <span className="font-display text-[40px] font-bold text-ink">${SITE.priceCAD}</span>
-                <span className="text-base text-ink-muted font-body"> CAD</span>
-                <p className="text-[12px] text-ink-muted font-body mt-1">
-                  ~${SITE.priceUSD} USD &middot; One-time payment
-                </p>
+              <div className="flex-1 mb-5 space-y-2">
+                {PLANS.strategy.features.map(function (item, i) {
+                  return (
+                    <div key={i} className="flex items-start gap-2">
+                      <div className="mt-0.5"><IconCheck size={13} /></div>
+                      <span className="text-[12px] text-ink-soft font-body leading-snug">{item}</span>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="flex-1 mb-6 space-y-2.5">
-                {[
-                  "All 7 modules + 35 lessons",
-                  "6 response frameworks",
-                  "40+ high-impact ideas bank",
-                  "40+ practice questions + expert answers",
-                  "3 expert video analysis tutorials",
-                  "Self-evaluation & tracking tools",
-                  "6 months of full access",
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <div className="mt-0.5"><IconCheck size={14} /></div>
-                    <span className="text-[13px] text-ink-soft font-body leading-snug">{item}</span>
-                  </div>
-                ))}
-              </div>
-              <Btn variant="primary" size="md" full href="/checkout">
-                Enroll Now
+              <Btn variant="secondary" size="md" full href="/checkout?plan=strategy">
+                Get Strategy Course
               </Btn>
             </div>
 
-            {/* Full Support */}
-            <div className="bg-white rounded-2xl p-7 md:p-8 border border-surface-border flex flex-col">
-              <h3 className="font-display text-xl font-bold text-ink mb-1">Full Support Package</h3>
-              <p className="font-body text-[13px] text-ink-muted mb-5">
-                Course + personalized 1-on-1 coaching
-              </p>
-              <div className="mb-6">
-                <span className="font-display text-[26px] font-bold text-ink">Custom Pricing</span>
-                <p className="text-[12px] text-ink-muted font-body mt-1">Tailored to your timeline</p>
+            {/* ── Full Course (Highlighted) ── */}
+            <div className="bg-white rounded-2xl p-6 border-2 border-brand-orange relative flex flex-col">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-br from-brand-orange to-brand-orange-dark text-white px-4 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase font-body whitespace-nowrap">
+                Most Popular — Save ${PLANS.full.savings}
               </div>
-              <div className="flex-1 mb-6 space-y-2.5">
+              <h3 className="font-display text-lg font-bold text-ink mb-0.5">{PLANS.full.name}</h3>
+              <p className="font-body text-[12px] text-ink-muted mb-4">{PLANS.full.subtitle}</p>
+              <div className="mb-5">
+                <span className="font-display text-[36px] font-bold text-ink">${PLANS.full.price}</span>
+                <span className="text-sm text-ink-muted font-body"> CAD</span>
+                <p className="text-[11px] text-ink-muted font-body mt-1">
+                  <span className="line-through">${PLANS.strategy.price + PLANS.question_bank.price}</span> — One-time payment
+                </p>
+              </div>
+              <div className="flex-1 mb-5 space-y-2">
+                {PLANS.full.features.map(function (item, i) {
+                  return (
+                    <div key={i} className="flex items-start gap-2">
+                      <div className="mt-0.5"><IconCheck size={13} /></div>
+                      <span className="text-[12px] text-ink-soft font-body leading-snug">{item}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <Btn variant="primary" size="md" full href="/checkout?plan=full">
+                Get Full Course
+              </Btn>
+            </div>
+
+            {/* ── Question Bank ── */}
+            <div className="bg-white rounded-2xl p-6 border border-surface-border flex flex-col">
+              <h3 className="font-display text-lg font-bold text-ink mb-0.5">{PLANS.question_bank.name}</h3>
+              <p className="font-body text-[12px] text-ink-muted mb-4">{PLANS.question_bank.subtitle}</p>
+              <div className="mb-5">
+                <span className="font-display text-[36px] font-bold text-ink">${PLANS.question_bank.price}</span>
+                <span className="text-sm text-ink-muted font-body"> CAD</span>
+                <p className="text-[11px] text-ink-muted font-body mt-1">One-time payment</p>
+              </div>
+              <div className="flex-1 mb-5 space-y-2">
+                {PLANS.question_bank.features.map(function (item, i) {
+                  return (
+                    <div key={i} className="flex items-start gap-2">
+                      <div className="mt-0.5"><IconCheck size={13} /></div>
+                      <span className="text-[12px] text-ink-soft font-body leading-snug">{item}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <Btn variant="secondary" size="md" full href="/checkout?plan=question_bank">
+                Get Question Bank
+              </Btn>
+            </div>
+
+            {/* ── 1-on-1 Coaching ── */}
+            <div className="bg-white rounded-2xl p-6 border border-surface-border flex flex-col">
+              <h3 className="font-display text-lg font-bold text-ink mb-0.5">1-on-1 Coaching</h3>
+              <p className="font-body text-[12px] text-ink-muted mb-4">Personalized CASPer support</p>
+              <div className="mb-5">
+                <span className="font-display text-[22px] font-bold text-ink">Custom Pricing</span>
+                <p className="text-[11px] text-ink-muted font-body mt-1">Tailored to your needs</p>
+              </div>
+              <div className="flex-1 mb-5 space-y-2">
                 {[
-                  "Everything in the Complete Course",
-                  "1-on-1 personalized CASPer coaching",
+                  "Personalized 1-on-1 CASPer coaching",
                   "Direct feedback on your responses",
-                  "Custom practice plan",
+                  "Custom practice plan for your timeline",
+                  "Strategy tailored to your strengths",
                   "Priority email support",
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <div className="mt-0.5"><IconCheck size={14} /></div>
-                    <span className="text-[13px] text-ink-soft font-body leading-snug">{item}</span>
-                  </div>
-                ))}
+                ].map(function (item, i) {
+                  return (
+                    <div key={i} className="flex items-start gap-2">
+                      <div className="mt-0.5"><IconCheck size={13} /></div>
+                      <span className="text-[12px] text-ink-soft font-body leading-snug">{item}</span>
+                    </div>
+                  );
+                })}
               </div>
               <a
-                href={`mailto:${SITE.email}?subject=Full%20Support%20Package%20Inquiry`}
-                className="flex items-center justify-center gap-2.5 px-7 py-3 rounded-lg font-body font-semibold text-[15px] no-underline bg-brand-blue text-white hover:brightness-110 transition-all w-full"
+                href={`mailto:${SITE.email}?subject=1-on-1%20CASPer%20Coaching%20Inquiry`}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-body font-semibold text-[14px] no-underline bg-brand-blue text-white hover:brightness-110 transition-all w-full"
               >
-                <IconMail size={16} className="text-white" /> Contact for Details
+                <IconMail size={15} className="text-white" /> Email to Inquire
               </a>
             </div>
           </div>
@@ -359,7 +400,7 @@ export default function HomePage() {
             Every day without a strategy is a day wasted.
             Get the frameworks, the practice, and the confidence.
           </p>
-          <Btn variant="primary" size="lg" href="/checkout">
+          <Btn variant="primary" size="lg" href="/checkout?plan=full">
             Start Your Preparation
           </Btn>
         </div>

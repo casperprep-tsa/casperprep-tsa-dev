@@ -1040,7 +1040,8 @@ function LessonContentRenderer({ lesson, moduleNum, responses, setResponses }) {
 export default function CourseLearnPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
-  const [hasAccess, setHasAccess] = useState(false);
+  const [hasStrategy, setHasStrategy] = useState(false);
+  const [hasQuestionBank, setHasQuestionBank] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeModule, setActiveModule] = useState(1);
   const [activeLesson, setActiveLesson] = useState(1);
@@ -1073,15 +1074,16 @@ export default function CourseLearnPage() {
 
       var profileResult = await supabase
         .from("profiles")
-        .select("has_access, access_expires_at")
+        .select("has_strategy, has_question_bank, access_expires_at")
         .eq("id", u.id)
         .single();
 
       var profile = profileResult.data;
-      if (profile && profile.has_access && profile.access_expires_at) {
+      if (profile && profile.access_expires_at) {
         var expires = new Date(profile.access_expires_at);
         if (expires > new Date()) {
-          setHasAccess(true);
+          if (profile.has_strategy) setHasStrategy(true);
+          if (profile.has_question_bank) setHasQuestionBank(true);
         }
       }
 
@@ -1157,16 +1159,51 @@ export default function CourseLearnPage() {
     );
   }
 
-  if (!hasAccess) {
+  var hasAnyAccess = hasStrategy || hasQuestionBank;
+
+  function canAccessModule(modNum) {
+    if (hasStrategy && hasQuestionBank) return true;
+    if (modNum <= 5) return hasStrategy;
+    if (modNum >= 6) return hasQuestionBank;
+    return false;
+  }
+
+  if (!hasAnyAccess) {
     return (
       <div className="min-h-screen bg-surface-cream flex items-center justify-center px-6">
         <div className="max-w-md text-center">
           <IconLock size={40} className="text-brand-blue mx-auto mb-4" />
           <h1 className="font-display text-2xl font-bold text-ink mb-3">Course Access Required</h1>
-          <p className="font-body text-sm text-ink-muted mb-6">Enroll in the CASPer Expert Strategy Course to access all 7 modules.</p>
-          <Btn variant="primary" size="md" href="/checkout">Enroll Now — $249 CAD</Btn>
+          <p className="font-body text-sm text-ink-muted mb-6">Choose a plan to start your CASPer preparation.</p>
+          <Btn variant="primary" size="md" href="/checkout?plan=full">Get Full Course — $215 CAD</Btn>
           <div className="mt-3">
-            <Link href="/course" className="text-sm text-brand-blue font-body no-underline hover:underline">Preview free content →</Link>
+            <Link href="/#pricing" className="text-sm text-brand-blue font-body no-underline hover:underline">View all plans →</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* Check if current module is accessible */
+  var moduleAccessible = canAccessModule(activeModule);
+
+  if (!moduleAccessible) {
+    var needsPlan = activeModule <= 5 ? "strategy" : "question_bank";
+    var needsLabel = activeModule <= 5 ? "Strategy Course" : "Question Bank";
+    var needsPrice = activeModule <= 5 ? 149 : 100;
+    return (
+      <div className="min-h-screen bg-surface-cream flex items-center justify-center px-6">
+        <div className="max-w-md text-center">
+          <IconLock size={40} className="text-brand-orange mx-auto mb-4" />
+          <h1 className="font-display text-xl font-bold text-ink mb-3">Module {activeModule} is Locked</h1>
+          <p className="font-body text-sm text-ink-muted mb-6">
+            This module is part of the {needsLabel}. Unlock it to continue your preparation.
+          </p>
+          <Btn variant="primary" size="md" href={"/checkout?plan=" + needsPlan}>
+            Get {needsLabel} — ${needsPrice} CAD
+          </Btn>
+          <div className="mt-3">
+            <Link href="/dashboard" className="text-sm text-brand-blue font-body no-underline hover:underline">← Back to Dashboard</Link>
           </div>
         </div>
       </div>

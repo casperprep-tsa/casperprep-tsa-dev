@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -204,6 +204,336 @@ function DownloadIcon({ size }) {
   );
 }
 
+/* ── Video/Written scenario mapping per practice set ── */
+/* true = video response, false = written response */
+var VIDEO_SCENARIO_MAP = {
+  "Practice Set 1": { 1: false, 2: false, 3: false, 4: true, 5: true },
+  "Practice Set 2": { 1: true, 2: true, 3: false, 4: false, 5: false },
+  "Practice Set 3": { 1: false, 2: false, 3: true, 4: true, 5: false },
+  "Practice Set 4": { 1: false, 2: true, 3: true, 4: false, 5: false },
+};
+
+function isVideoScenario(lessonTitle, scenarioNum) {
+  var setName = Object.keys(VIDEO_SCENARIO_MAP).find(function (k) {
+    return lessonTitle.indexOf(k) !== -1;
+  });
+  if (!setName) return false;
+  return VIDEO_SCENARIO_MAP[setName][scenarioNum] || false;
+}
+
+
+/* ════════════════════════════════════════════════════════════ */
+/*  COUNTDOWN TIMER                                            */
+/* ════════════════════════════════════════════════════════════ */
+
+function PracticeTimer() {
+  var ref = useState(5);
+  var inputMin = ref[0], setInputMin = ref[1];
+  var ref2 = useState(0);
+  var inputSec = ref2[0], setInputSec = ref2[1];
+  var ref3 = useState(null);
+  var remaining = ref3[0], setRemaining = ref3[1];
+  var ref4 = useState(false);
+  var running = ref4[0], setRunning = ref4[1];
+  var ref5 = useState(false);
+  var finished = ref5[0], setFinished = ref5[1];
+  var intervalRef = useRef(null);
+  var totalRef = useRef(0);
+
+  useEffect(function () {
+    return function () {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  useEffect(function () {
+    if (running && remaining > 0) {
+      intervalRef.current = setInterval(function () {
+        setRemaining(function (prev) {
+          if (prev <= 1) {
+            clearInterval(intervalRef.current);
+            setRunning(false);
+            setFinished(true);
+            playAlarm();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return function () {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [running, remaining]);
+
+  function playAlarm() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0, 0.3, 0.6].forEach(function (delay) {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 880;
+        osc.type = "sine";
+        gain.gain.value = 0.3;
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.2);
+      });
+    } catch (e) { /* silent */ }
+  }
+
+  function startTimer() {
+    var total = inputMin * 60 + inputSec;
+    if (total <= 0) return;
+    totalRef.current = total;
+    setRemaining(total);
+    setRunning(true);
+    setFinished(false);
+  }
+
+  function pauseTimer() { setRunning(false); }
+  function resumeTimer() { if (remaining > 0) setRunning(true); }
+  function resetTimer() {
+    setRunning(false);
+    setRemaining(null);
+    setFinished(false);
+  }
+
+  function formatTime(s) {
+    var m = Math.floor(s / 60);
+    var sec = s % 60;
+    return String(m).padStart(2, "0") + ":" + String(sec).padStart(2, "0");
+  }
+
+  var isActive = remaining !== null;
+  var pct = isActive && totalRef.current > 0 ? ((totalRef.current - remaining) / totalRef.current) * 100 : 0;
+
+  return (
+    <div className={"mb-6 rounded-xl border px-5 py-4 " + (finished ? "border-red-400 bg-red-50" : "border-brand-blue/20 bg-brand-blue-light/40")}>
+      <div className="flex items-center gap-2 mb-3">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={finished ? "text-red-500" : "text-brand-blue"}>
+          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+        </svg>
+        <span className={"font-body text-[13px] font-semibold " + (finished ? "text-red-700" : "text-brand-blue")}>
+          {finished ? "⏰ Time's Up!" : "Practice Timer"}
+        </span>
+      </div>
+
+      {!isActive && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1">
+            <input type="number" min="0" max="99" value={inputMin} onChange={function (e) { setInputMin(Math.max(0, parseInt(e.target.value) || 0)); }}
+              className="w-14 rounded-lg border border-surface-border bg-white px-2 py-1.5 font-mono text-center text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-blue/30" />
+            <span className="text-[12px] text-ink-muted font-body">min</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <input type="number" min="0" max="59" value={inputSec} onChange={function (e) { setInputSec(Math.max(0, Math.min(59, parseInt(e.target.value) || 0))); }}
+              className="w-14 rounded-lg border border-surface-border bg-white px-2 py-1.5 font-mono text-center text-[14px] text-ink focus:outline-none focus:ring-2 focus:ring-brand-blue/30" />
+            <span className="text-[12px] text-ink-muted font-body">sec</span>
+          </div>
+          <button onClick={startTimer} className="ml-2 px-4 py-1.5 rounded-lg bg-brand-blue text-white text-[13px] font-body font-semibold hover:brightness-110 transition-all cursor-pointer border-none">
+            Start Timer
+          </button>
+        </div>
+      )}
+
+      {isActive && (
+        <div>
+          {/* Progress bar */}
+          <div className="h-2 rounded-full bg-gray-200 mb-3 overflow-hidden">
+            <div className={"h-full rounded-full transition-all duration-1000 " + (finished ? "bg-red-500" : remaining < 30 ? "bg-amber-500" : "bg-brand-blue")}
+              style={{ width: Math.min(pct, 100) + "%" }} />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className={"font-mono text-[28px] font-bold " + (finished ? "text-red-600" : remaining < 30 ? "text-amber-600" : "text-ink")}>
+              {formatTime(remaining)}
+            </span>
+            <div className="flex gap-2">
+              {running && (
+                <button onClick={pauseTimer} className="px-3 py-1.5 rounded-lg bg-amber-100 text-amber-700 text-[12px] font-body font-semibold hover:bg-amber-200 transition-colors cursor-pointer border-none">
+                  Pause
+                </button>
+              )}
+              {!running && remaining > 0 && !finished && (
+                <button onClick={resumeTimer} className="px-3 py-1.5 rounded-lg bg-green-100 text-green-700 text-[12px] font-body font-semibold hover:bg-green-200 transition-colors cursor-pointer border-none">
+                  Resume
+                </button>
+              )}
+              <button onClick={resetTimer} className="px-3 py-1.5 rounded-lg bg-gray-100 text-ink-muted text-[12px] font-body font-semibold hover:bg-gray-200 transition-colors cursor-pointer border-none">
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+/* ════════════════════════════════════════════════════════════ */
+/*  VIDEO RECORDER                                             */
+/* ════════════════════════════════════════════════════════════ */
+
+function VideoRecorder({ recordingKey, recordings, setRecordings }) {
+  var ref1 = useState(false);
+  var isRecording = ref1[0], setIsRecording = ref1[1];
+  var ref2 = useState(null);
+  var mediaRecorder = ref2[0], setMediaRecorder = ref2[1];
+  var ref3 = useState(null);
+  var stream = ref3[0], setStream = ref3[1];
+  var ref4 = useState(null);
+  var error = ref4[0], setError = ref4[1];
+  var ref5 = useState(null);
+  var previewStream = ref5[0], setPreviewStream = ref5[1];
+  var videoPreviewRef = useRef(null);
+  var chunksRef = useRef([]);
+
+  var existing = recordings[recordingKey] || null;
+
+  function startRecording() {
+    setError(null);
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(function (s) {
+        setStream(s);
+        setPreviewStream(s);
+        chunksRef.current = [];
+        var mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+          ? "video/webm;codecs=vp9,opus"
+          : MediaRecorder.isTypeSupported("video/webm")
+          ? "video/webm"
+          : "video/mp4";
+        var mr = new MediaRecorder(s, { mimeType: mimeType });
+        mr.ondataavailable = function (e) {
+          if (e.data.size > 0) chunksRef.current.push(e.data);
+        };
+        mr.onstop = function () {
+          var blob = new Blob(chunksRef.current, { type: mimeType });
+          var url = URL.createObjectURL(blob);
+          setRecordings(function (prev) {
+            var next = Object.assign({}, prev);
+            next[recordingKey] = { blob: blob, url: url, mimeType: mimeType };
+            return next;
+          });
+          s.getTracks().forEach(function (t) { t.stop(); });
+          setStream(null);
+          setPreviewStream(null);
+        };
+        mr.start(1000);
+        setMediaRecorder(mr);
+        setIsRecording(true);
+      })
+      .catch(function (err) {
+        setError("Camera access denied. Please allow camera and microphone access to record video responses.");
+      });
+  }
+
+  function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    }
+    setIsRecording(false);
+  }
+
+  function deleteRecording() {
+    if (existing && existing.url) URL.revokeObjectURL(existing.url);
+    setRecordings(function (prev) {
+      var next = Object.assign({}, prev);
+      delete next[recordingKey];
+      return next;
+    });
+  }
+
+  function downloadRecording() {
+    if (!existing) return;
+    var a = document.createElement("a");
+    a.href = existing.url;
+    a.download = recordingKey.replace(/[^a-zA-Z0-9-_]/g, "_") + ".webm";
+    a.click();
+  }
+
+  /* Live preview */
+  useEffect(function () {
+    if (previewStream && videoPreviewRef.current) {
+      videoPreviewRef.current.srcObject = previewStream;
+    }
+  }, [previewStream]);
+
+  return (
+    <div className="rounded-lg border border-surface-border bg-surface-cream p-4">
+      {error && (
+        <div className="mb-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2">
+          <p className="font-body text-[12px] text-red-700">{error}</p>
+        </div>
+      )}
+
+      {/* Live preview while recording */}
+      {isRecording && (
+        <div className="mb-3 relative">
+          <video
+            ref={function (el) { videoPreviewRef.current = el; if (el && previewStream) el.srcObject = previewStream; }}
+            autoPlay muted playsInline
+            className="w-full rounded-lg bg-black aspect-video object-cover"
+          />
+          <div className="absolute top-3 left-3 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full">
+            <div className="w-2.5 h-2.5 rounded-full bg-white animate-pulse" />
+            <span className="text-[11px] font-body font-bold">RECORDING</span>
+          </div>
+        </div>
+      )}
+
+      {/* Playback of recorded video */}
+      {!isRecording && existing && (
+        <div className="mb-3">
+          <video src={existing.url} controls playsInline className="w-full rounded-lg bg-black aspect-video" />
+        </div>
+      )}
+
+      {/* Controls */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {!isRecording && !existing && (
+          <button onClick={startRecording} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white text-[13px] font-body font-semibold hover:bg-red-600 transition-colors cursor-pointer border-none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="7" /></svg>
+            Start Recording
+          </button>
+        )}
+        {isRecording && (
+          <button onClick={stopRecording} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 text-white text-[13px] font-body font-semibold hover:bg-gray-900 transition-colors cursor-pointer border-none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+            Stop Recording
+          </button>
+        )}
+        {!isRecording && existing && (
+          <>
+            <button onClick={startRecording} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500 text-white text-[12px] font-body font-semibold hover:bg-red-600 transition-colors cursor-pointer border-none">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="7" /></svg>
+              Re-record
+            </button>
+            <button onClick={downloadRecording} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-blue-light text-brand-blue text-[12px] font-body font-semibold hover:bg-blue-100 transition-colors cursor-pointer border-none">
+              <DownloadIcon size={12} /> Download Video
+            </button>
+            <button onClick={deleteRecording} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 text-ink-muted text-[12px] font-body font-semibold hover:bg-gray-200 transition-colors cursor-pointer border-none">
+              Delete
+            </button>
+          </>
+        )}
+      </div>
+
+      {!existing && !isRecording && (
+        <p className="mt-2 font-body text-[11px] text-ink-muted">
+          Click to record your video response. Ensure your camera and microphone are enabled.
+        </p>
+      )}
+    </div>
+  );
+}
+
+
+/* ════════════════════════════════════════════════════════════ */
+/*  DISCLAIMER                                                 */
+/* ════════════════════════════════════════════════════════════ */
+
 function Disclaimer() {
   return (
     <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4">
@@ -214,9 +544,10 @@ function Disclaimer() {
             Your responses are stored temporarily
           </p>
           <p className="font-body text-[13px] text-amber-800 leading-relaxed">
-            Your typed answers will be kept as you navigate between lessons,
-            but <b>will be lost if you close or refresh the page</b>. Use the
-            download buttons to save your work locally before leaving.
+            Your typed answers and video recordings will be kept as you navigate
+            between lessons, but <b>will be lost if you close or refresh the
+            page</b>. Use the download buttons to save your written responses as
+            PDF and video recordings before leaving.
           </p>
         </div>
       </div>
@@ -226,10 +557,10 @@ function Disclaimer() {
 
 
 /* ════════════════════════════════════════════════════════════ */
-/*  PRACTICE SET VIEW (Module 6)                              */
+/*  PRACTICE SET VIEW (Module 6) — with Timer & Video          */
 /* ════════════════════════════════════════════════════════════ */
 
-function PracticeSetView({ lesson, moduleNum, responses, setResponses }) {
+function PracticeSetView({ lesson, moduleNum, responses, setResponses, recordings, setRecordings }) {
   var scenarios = parsePracticeScenarios(lesson.content);
   var setTitle = lesson.title;
 
@@ -246,47 +577,133 @@ function PracticeSetView({ lesson, moduleNum, responses, setResponses }) {
   }
 
   function downloadScenario(scenario) {
-    var sections = [];
-    sections.push({ heading: "Prompt", body: stripHtml(scenario.prompt) });
-    scenario.questions.forEach(function (q) {
-      sections.push({ heading: "Q" + q.num + ": " + stripHtml(q.text), body: responses[getKey(scenario.num, q.num)] || "(No response)" });
-    });
-    downloadPDF(
-      setTitle.replace(/\s+/g, "_") + "_Scenario_" + scenario.num + ".pdf",
-      setTitle + " — Scenario " + scenario.num,
-      sections
-    );
-  }
+    var isVideo = isVideoScenario(setTitle, scenario.num);
 
-  function downloadAll() {
-    var sections = [];
-    scenarios.forEach(function (scenario) {
-      sections.push({ type: "divider" });
-      sections.push({ heading: "Scenario " + scenario.num });
+    if (isVideo) {
+      /* Download video files for each question */
+      scenario.questions.forEach(function (q) {
+        var vKey = getKey(scenario.num, q.num) + "-video";
+        var rec = recordings[vKey];
+        if (rec && rec.url) {
+          var a = document.createElement("a");
+          a.href = rec.url;
+          a.download = setTitle.replace(/\s+/g, "_") + "_Scenario_" + scenario.num + "_Q" + q.num + ".webm";
+          a.click();
+        }
+      });
+      /* Also make a PDF with just the prompts/questions */
+      var sections = [];
+      sections.push({ heading: "Prompt", body: stripHtml(scenario.prompt) });
+      scenario.questions.forEach(function (q) {
+        sections.push({ heading: "Q" + q.num + ": " + stripHtml(q.text), body: "(Video response — see downloaded video file)" });
+      });
+      downloadPDF(
+        setTitle.replace(/\s+/g, "_") + "_Scenario_" + scenario.num + "_Questions.pdf",
+        setTitle + " — Scenario " + scenario.num + " (Video Response)",
+        sections
+      );
+    } else {
+      /* Written — download as PDF */
+      var sections = [];
       sections.push({ heading: "Prompt", body: stripHtml(scenario.prompt) });
       scenario.questions.forEach(function (q) {
         sections.push({ heading: "Q" + q.num + ": " + stripHtml(q.text), body: responses[getKey(scenario.num, q.num)] || "(No response)" });
       });
-    });
-    downloadPDF(
-      setTitle.replace(/\s+/g, "_") + "_All_Responses.pdf",
-      setTitle + " — All Responses",
-      sections
-    );
+      downloadPDF(
+        setTitle.replace(/\s+/g, "_") + "_Scenario_" + scenario.num + ".pdf",
+        setTitle + " — Scenario " + scenario.num,
+        sections
+      );
+    }
   }
 
-  var hasAny = scenarios.some(function (s) {
+  function downloadAll() {
+    /* Written scenarios → single PDF */
+    var writtenSections = [];
+    var hasWritten = false;
+    scenarios.forEach(function (scenario) {
+      if (isVideoScenario(setTitle, scenario.num)) return;
+      hasWritten = true;
+      writtenSections.push({ type: "divider" });
+      writtenSections.push({ heading: "Scenario " + scenario.num });
+      writtenSections.push({ heading: "Prompt", body: stripHtml(scenario.prompt) });
+      scenario.questions.forEach(function (q) {
+        writtenSections.push({ heading: "Q" + q.num + ": " + stripHtml(q.text), body: responses[getKey(scenario.num, q.num)] || "(No response)" });
+      });
+    });
+    if (hasWritten) {
+      downloadPDF(
+        setTitle.replace(/\s+/g, "_") + "_Written_Responses.pdf",
+        setTitle + " — Written Responses",
+        writtenSections
+      );
+    }
+
+    /* Video scenarios → download each video file with Scenario_X_QY naming + a questions PDF */
+    var videoSections = [];
+    scenarios.forEach(function (scenario) {
+      if (!isVideoScenario(setTitle, scenario.num)) return;
+      videoSections.push({ type: "divider" });
+      videoSections.push({ heading: "Scenario " + scenario.num + " (Video Response)" });
+      videoSections.push({ heading: "Prompt", body: stripHtml(scenario.prompt) });
+      scenario.questions.forEach(function (q) {
+        var vKey = getKey(scenario.num, q.num) + "-video";
+        var rec = recordings[vKey];
+        var fname = setTitle.replace(/\s+/g, "_") + "_Scenario_" + scenario.num + "_Q" + q.num + ".webm";
+        videoSections.push({ heading: "Q" + q.num + ": " + stripHtml(q.text), body: rec ? "(Video response — see " + fname + ")" : "(No video recorded)" });
+        if (rec && rec.url) {
+          /* Download video immediately in user event chain so browser doesn't block */
+          var a = document.createElement("a");
+          a.href = rec.url;
+          a.download = fname;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      });
+    });
+
+    /* Download the video questions PDF */
+    if (videoSections.length > 0) {
+      downloadPDF(
+        setTitle.replace(/\s+/g, "_") + "_Video_Questions.pdf",
+        setTitle + " — Video Response Questions",
+        videoSections
+      );
+    }
+  }
+
+  var hasAnyWritten = scenarios.some(function (s) {
+    if (isVideoScenario(setTitle, s.num)) return false;
     return s.questions.some(function (q) { return (responses[getKey(s.num, q.num)] || "").trim(); });
   });
+  var hasAnyVideo = scenarios.some(function (s) {
+    if (!isVideoScenario(setTitle, s.num)) return false;
+    return s.questions.some(function (q) { return recordings[getKey(s.num, q.num) + "-video"]; });
+  });
+  var hasAny = hasAnyWritten || hasAnyVideo;
 
   return (
     <div>
       <Disclaimer />
       {scenarios.map(function (scenario) {
+        var isVideo = isVideoScenario(setTitle, scenario.num);
         return (
-          <div key={scenario.num} className="mb-8 rounded-xl border border-surface-border bg-white p-5 md:p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-[17px] font-bold text-ink">Scenario {scenario.num}</h3>
+          <div key={scenario.num} className={"mb-8 rounded-xl border bg-white p-5 md:p-6 shadow-sm " + (isVideo ? "border-red-200" : "border-surface-border")}>
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <h3 className="font-display text-[17px] font-bold text-ink">Scenario {scenario.num}</h3>
+                {isVideo ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 border border-red-200 text-[11px] font-body font-semibold text-red-600">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-red-500"><circle cx="12" cy="12" r="7" /></svg>
+                    Video Response
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-[11px] font-body font-semibold text-brand-blue">
+                    ✍️ Written Response
+                  </span>
+                )}
+              </div>
               <button onClick={function () { downloadScenario(scenario); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-body font-semibold text-brand-blue bg-brand-blue-light hover:bg-blue-100 transition-colors cursor-pointer border-none">
                 <DownloadIcon size={14} /> Save
               </button>
@@ -295,6 +712,7 @@ function PracticeSetView({ lesson, moduleNum, responses, setResponses }) {
               <p className="font-mono text-[10px] text-ink-muted font-bold tracking-[1.5px] uppercase mb-1.5">Prompt</p>
               <p className="font-body text-[14px] text-ink-soft leading-relaxed"><RichText html={scenario.prompt} /></p>
             </div>
+            <PracticeTimer />
             {scenario.questions.map(function (q) {
               return (
                 <div key={q.num} className="mb-5 last:mb-0">
@@ -302,13 +720,21 @@ function PracticeSetView({ lesson, moduleNum, responses, setResponses }) {
                     <span className="font-body text-[14px] font-semibold text-ink">Q{q.num}: </span>
                     <span className="font-body text-[14px] text-ink-soft"><RichText html={q.text} /></span>
                   </label>
-                  <textarea
-                    value={responses[getKey(scenario.num, q.num)] || ""}
-                    onChange={function (e) { handleChange(scenario.num, q.num, e.target.value); }}
-                    placeholder="Type your response here..."
-                    rows={6}
-                    className="w-full rounded-lg border border-surface-border bg-surface-cream px-4 py-3 font-body text-[14px] text-ink leading-relaxed placeholder:text-ink-muted/50 focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue transition-all resize-y"
-                  />
+                  {isVideo ? (
+                    <VideoRecorder
+                      recordingKey={getKey(scenario.num, q.num) + "-video"}
+                      recordings={recordings}
+                      setRecordings={setRecordings}
+                    />
+                  ) : (
+                    <textarea
+                      value={responses[getKey(scenario.num, q.num)] || ""}
+                      onChange={function (e) { handleChange(scenario.num, q.num, e.target.value); }}
+                      placeholder="Type your response here..."
+                      rows={6}
+                      className="w-full rounded-lg border border-surface-border bg-surface-cream px-4 py-3 font-body text-[14px] text-ink leading-relaxed placeholder:text-ink-muted/50 focus:outline-none focus:ring-2 focus:ring-brand-blue/30 focus:border-brand-blue transition-all resize-y"
+                    />
+                  )}
                 </div>
               );
             })}
@@ -621,6 +1047,7 @@ export default function CourseLearnPage() {
   const [completedLessons, setCompletedLessons] = useState(new Set());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [practiceResponses, setPracticeResponses] = useState({});
+  const [videoRecordings, setVideoRecordings] = useState({});
 
   /* Read ?m=X&l=Y from URL on mount */
   useEffect(function () {
@@ -854,6 +1281,8 @@ export default function CourseLearnPage() {
                 moduleNum={activeModule}
                 responses={practiceResponses}
                 setResponses={setPracticeResponses}
+                recordings={videoRecordings}
+                setRecordings={setVideoRecordings}
               />
             )}
 

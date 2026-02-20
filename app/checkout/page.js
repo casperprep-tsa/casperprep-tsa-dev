@@ -5,7 +5,7 @@ import { IconCheck, IconLock, IconMail } from "@/components/Icons";
 import EnrollButton from "@/components/EnrollButton";
 
 export const metadata = {
-  title: "Enroll | CASPer Prep by TSA",
+  title: "Enroll",
   description: "Enroll in the CASPer Expert Strategy Course v2.0. 7 modules, expert video tutorials, 40+ high-impact ideas. $249 CAD one-time payment.",
 };
 

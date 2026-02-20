@@ -1,7 +1,7 @@
 import { SITE } from "@/lib/constants";
 
 export const metadata = {
-  title: "Terms of Service | CASPer Prep by TSA",
+  title: "Terms of Service",
   description: "Terms of service, refund policy, and privacy policy for the CASPer Expert Strategy Course by The Success Architect.",
 };
 

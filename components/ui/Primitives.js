@@ -18,7 +18,7 @@ export function Btn({ children, onClick, variant = "primary", size = "md", full 
   const sizes = { sm: "px-5 py-2.5 text-[13px]", md: "px-7 py-3 text-[15px]", lg: "px-9 py-4 text-[17px]" };
   const variants = {
     primary: "bg-brand-orange text-white hover:brightness-110",
-    secondary: "bg-transparent text-brand-orange border-2 !border-brand-orange hover:bg-brand-orange-light",
+    secondary: "bg-brand-orange-light text-brand-orange border-2 !border-brand-orange hover:brightness-95",
     dark: "bg-brand-blue text-white hover:brightness-110",
     ghost: "bg-transparent text-ink-soft border !border-surface-border hover:bg-gray-50",
     white: "bg-white text-brand-blue hover:bg-gray-50",
@@ -75,3 +75,4 @@ export function Stars({ count = 5 }) {
     </div>
   );
 }
+

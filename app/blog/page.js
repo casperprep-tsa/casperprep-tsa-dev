@@ -3,7 +3,7 @@ import { Badge, SectionLabel } from "@/components/ui/Primitives";
 import { IconInstagram, IconTikTok } from "@/components/Icons";
 
 export const metadata = {
-  title: "Blog | CASPer Prep by TSA",
+  title: "Blog",
   description: "CASPer insights, strategy breakdowns, and preparation tips from The Success Architect.",
 };
 

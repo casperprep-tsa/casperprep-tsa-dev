@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BrandMark, Btn } from "./ui/Primitives";
+import { createClient } from "@/lib/supabase/client";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -14,13 +15,36 @@ const NAV_LINKS = [
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const pathname = usePathname();
+
+  const hidden = pathname?.startsWith("/auth") || pathname?.startsWith("/course/learn");
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", h);
     return () => window.removeEventListener("scroll", h);
   }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      setAuthLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (hidden) return null;
 
   return (
     <nav
@@ -57,9 +81,27 @@ export default function Nav() {
               </Link>
             );
           })}
-          <Btn variant="primary" size="sm" href="/checkout">
-            Enroll Now
-          </Btn>
+          {!authLoading && (
+            user ? (
+              <Btn variant="primary" size="sm" href="/dashboard">
+                Dashboard
+              </Btn>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/auth/login"
+                  className={`font-body text-sm no-underline transition-colors ${
+                    scrolled ? "text-ink-soft hover:text-ink" : "text-white/80 hover:text-white"
+                  }`}
+                >
+                  Sign In
+                </Link>
+                <Btn variant="primary" size="sm" href="/checkout">
+                  Enroll Now
+                </Btn>
+              </div>
+            )
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -89,8 +131,8 @@ export default function Nav() {
               {link.label}
             </Link>
           ))}
-          <Btn variant="primary" size="sm" full href="/checkout">
-            Enroll Now
+          <Btn variant="primary" size="sm" full href={user ? "/dashboard" : "/checkout"}>
+            {user ? "Dashboard" : "Enroll Now"}
           </Btn>
         </div>
       )}

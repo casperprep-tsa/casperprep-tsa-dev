@@ -1,9 +1,15 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { BrandMark } from "./ui/Primitives";
 import { IconMail, IconInstagram, IconTikTok } from "./Icons";
 import { SITE } from "@/lib/constants";
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/auth") || pathname?.startsWith("/course/learn")) return null;
+
   return (
     <footer className="bg-brand-blue-deep text-white/60 pt-14 pb-7 px-6">
       <div className="max-w-[1140px] mx-auto">

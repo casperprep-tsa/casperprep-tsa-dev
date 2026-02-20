@@ -1162,13 +1162,15 @@ export default function CourseLearnPage() {
   var hasAnyAccess = hasStrategy || hasQuestionBank;
 
   function canAccessModule(modNum) {
+    /* Module 4 (video tutorials) is free for all signed-up users */
+    if (modNum === 4) return true;
     if (hasStrategy && hasQuestionBank) return true;
     if (modNum <= 5) return hasStrategy;
     if (modNum >= 6) return hasQuestionBank;
     return false;
   }
 
-  if (!hasAnyAccess) {
+  if (!hasAnyAccess && !canAccessModule(activeModule)) {
     return (
       <div className="min-h-screen bg-surface-cream flex items-center justify-center px-6">
         <div className="max-w-md text-center">
@@ -1176,8 +1178,9 @@ export default function CourseLearnPage() {
           <h1 className="font-display text-2xl font-bold text-ink mb-3">Course Access Required</h1>
           <p className="font-body text-sm text-ink-muted mb-6">Choose a plan to start your CASPer preparation.</p>
           <Btn variant="primary" size="md" href="/checkout?plan=full">Get Full Course — $215 CAD</Btn>
-          <div className="mt-3">
-            <Link href="/#pricing" className="text-sm text-brand-blue font-body no-underline hover:underline">View all plans →</Link>
+          <div className="mt-4 flex flex-col gap-2">
+            <Link href="/course" className="text-sm text-brand-blue font-body font-semibold no-underline hover:underline">Preview free content — Video Tutorials →</Link>
+            <Link href="/#pricing" className="text-sm text-ink-muted font-body no-underline hover:underline">View all plans</Link>
           </div>
         </div>
       </div>
@@ -1202,8 +1205,9 @@ export default function CourseLearnPage() {
           <Btn variant="primary" size="md" href={"/checkout?plan=" + needsPlan}>
             Get {needsLabel} — ${needsPrice} CAD
           </Btn>
-          <div className="mt-3">
-            <Link href="/dashboard" className="text-sm text-brand-blue font-body no-underline hover:underline">← Back to Dashboard</Link>
+          <div className="mt-4 flex flex-col gap-2">
+            <Link href="/course" className="text-sm text-brand-blue font-body font-semibold no-underline hover:underline">Preview free content — Video Tutorials →</Link>
+            <Link href="/dashboard" className="text-sm text-ink-muted font-body no-underline hover:underline">← Back to Dashboard</Link>
           </div>
         </div>
       </div>

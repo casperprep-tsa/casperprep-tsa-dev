@@ -33,8 +33,7 @@ export default function UpgradeToast({ daysRemaining }) {
               Upgrade to Full Course — Just $66
             </p>
             <p className="font-body text-[12px] text-ink-muted leading-relaxed mb-3">
-              As a Strategy Course student, you can unlock the Question Bank &
-              Self-Evaluation for only <b>$66 CAD</b> (instead of $99).{" "}
+              As a Strategy Course student, you can unlock the Question Bank for only <b>$66 CAD</b> (instead of $99).{" "}
               <b className="text-brand-orange">
                 {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left
               </b>{" "}

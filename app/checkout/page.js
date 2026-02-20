@@ -29,15 +29,15 @@ var PLAN_DETAILS = {
   },
   question_bank: {
     key: "question_bank",
-    heading: "Question Bank + Self-Evaluation",
+    heading: "Question Bank",
     sub: "Modules 6–7",
-    tagline: "Practice with real scenarios and track your progress.",
+    tagline: "Practice with real questions and track your progress.",
     modules: [
-      { title: "Module 6: Comprehensive Question Bank", desc: "4 practice sets with 20+ scenarios, video & written formats, built-in timer, expert answer keys" },
+      { title: "Module 6: Comprehensive Question Bank", desc: "4 practice sets with 40+ questions, video & written formats, built-in timer, expert answer keys" },
       { title: "Module 7: CASPer Self-Evaluation", desc: "Reflection tools, daily practice logs & self-assessment score tracker" },
     ],
     extras: [
-      "20+ practice scenarios with expert answers",
+      "40+ practice questions with expert answers",
       "Video & written response practice",
       "Built-in practice timer per scenario",
       "Self-evaluation & progress tracking tools",
@@ -55,7 +55,7 @@ var PLAN_DETAILS = {
       { title: "Module 3: 6 Structured Frameworks", desc: "Situational Judgment, Reform, STAR-T, Improvement, Big Thought-Provoking & Reflection frameworks" },
       { title: "Module 4: Expert Video Analysis Tutorials", desc: "3 expert video breakdowns — perspectives, assumptions, and actions" },
       { title: "Module 5: The 30-Second Success Formula", desc: "30-second reflection strategy, quick notes template & typing speed optimization" },
-      { title: "Module 6: Comprehensive Question Bank", desc: "4 practice sets with 20+ scenarios, video & written formats, built-in timer, expert answer keys" },
+      { title: "Module 6: Comprehensive Question Bank", desc: "4 practice sets with 40+ questions, video & written formats, built-in timer, expert answer keys" },
       { title: "Module 7: CASPer Self-Evaluation", desc: "Reflection tools, daily practice logs & self-assessment score tracker" },
     ],
     extras: [
@@ -73,11 +73,11 @@ var PLAN_DETAILS = {
     sub: "Add Modules 6–7",
     tagline: "You already have the Strategy Course. Unlock the rest for a special price.",
     modules: [
-      { title: "Module 6: Comprehensive Question Bank", desc: "4 practice sets with 20+ scenarios, video & written formats, built-in timer, expert answer keys" },
+      { title: "Module 6: Comprehensive Question Bank", desc: "4 practice sets with 40+ questions, video & written formats, built-in timer, expert answer keys" },
       { title: "Module 7: CASPer Self-Evaluation", desc: "Reflection tools, daily practice logs & self-assessment score tracker" },
     ],
     extras: [
-      "20+ practice scenarios with expert answers",
+      "40+ practice questions with expert answers",
       "Video & written response practice",
       "Built-in practice timer per scenario",
       "Self-evaluation & progress tracking tools",

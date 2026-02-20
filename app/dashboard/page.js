@@ -317,10 +317,10 @@ export default async function DashboardPage() {
                 <div className="mb-6 bg-brand-blue-light rounded-xl border border-brand-blue/20 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
                     <p className="font-body text-[14px] font-bold text-brand-blue mb-0.5">
-                      Unlock the Question Bank & Self-Evaluation
+                      Unlock the Question Bank
                     </p>
                     <p className="font-body text-[12px] text-ink-muted">
-                      Get Modules 6-7 with 20+ practice scenarios, expert answer keys, and tracking tools.
+                      Get Modules 6-7 with 40+ practice questions, expert answer keys, and tracking tools.
                     </p>
                   </div>
                   <Link

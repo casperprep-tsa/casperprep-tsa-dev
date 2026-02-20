@@ -230,7 +230,7 @@ export default function CoursePage() {
                 <p className="font-body text-sm text-ink-muted leading-relaxed max-w-[400px] mx-auto mb-6">
                   {activeModule <= 5
                     ? "This module is part of the Strategy Course. Unlock Modules 1-5 with frameworks, expert videos, and the ideas bank."
-                    : "This module is part of the Question Bank. Unlock Modules 6-7 with 20+ practice scenarios and self-evaluation tools."
+                    : "This module is part of the Question Bank. Unlock Modules 6-7 with 40+ practice questions and tracking tools."
                   }
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">

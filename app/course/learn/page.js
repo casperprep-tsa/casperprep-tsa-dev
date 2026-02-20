@@ -1414,4 +1414,3 @@ export default function CourseLearnPage() {
   );
 }
 
-

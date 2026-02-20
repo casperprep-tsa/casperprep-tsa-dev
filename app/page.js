@@ -38,10 +38,10 @@ export default function HomePage() {
               </p>
 
               <div className="flex gap-3 justify-center lg:justify-start flex-wrap mb-4">
-                <Btn variant="primary" size="lg" href="/checkout?plan=full">
+                <Btn variant="primary" size="lg" href="/checkout?plan=full" className="min-w-[280px] text-center">
                   Enroll Now — From ${PLANS.question_bank.price} CAD
                 </Btn>
-                <Btn variant="secondary" size="lg" href="/course">
+                <Btn variant="secondary" size="lg" href="/course" className="min-w-[280px] text-center">
                   Preview the Course
                 </Btn>
               </div>

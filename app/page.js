@@ -5,7 +5,7 @@ import { IconCheck, IconShield, IconTarget, IconVideo, IconBook, IconPen, IconUs
 
 export const metadata = {
   title: { absolute: "CASPer Prep by TSA | Expert Strategy Course v2.0" },
-  description: "Stop guessing. Start scoring in the top quartile. 7 modules, expert video tutorials, 40+ high-impact ideas, and practice scenarios with sample answers. Plans from $100 CAD.",
+  description: "Stop guessing. Start scoring in the top quartile. 7 modules, expert video tutorials, 40+ high-impact ideas, and practice scenarios with sample answers. Plans from $99 CAD.",
 };
 
 export default function HomePage() {

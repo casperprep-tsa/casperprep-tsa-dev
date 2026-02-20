@@ -9,7 +9,7 @@ var PLAN_CONFIG = {
   },
   question_bank: {
     name: "CASPer Expert Strategy Course — Question Bank (Modules 6-7)",
-    price: 10000,
+    price: 9900,
   },
   full: {
     name: "CASPer Expert Strategy Course — Full Course (All 7 Modules)",

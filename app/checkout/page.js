@@ -81,7 +81,7 @@ var PLAN_DETAILS = {
       "Video & written response practice",
       "Built-in practice timer per scenario",
       "Self-evaluation & progress tracking tools",
-      "Exclusive upgrade pricing — save $34",
+      "Exclusive upgrade pricing — save $33",
     ],
   },
 };

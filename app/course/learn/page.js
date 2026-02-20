@@ -1193,7 +1193,7 @@ export default function CourseLearnPage() {
   if (!moduleAccessible) {
     var needsPlan = activeModule <= 5 ? "strategy" : "question_bank";
     var needsLabel = activeModule <= 5 ? "Strategy Course" : "Question Bank";
-    var needsPrice = activeModule <= 5 ? 149 : 100;
+    var needsPrice = activeModule <= 5 ? 149 : 99;
     return (
       <div className="min-h-screen bg-surface-cream flex items-center justify-center px-6">
         <div className="max-w-md text-center">

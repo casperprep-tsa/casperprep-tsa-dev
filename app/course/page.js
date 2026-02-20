@@ -38,7 +38,12 @@ export default function CoursePage() {
       if (profile && profile.access_expires_at) {
         var expires = new Date(profile.access_expires_at);
         if (expires > new Date() && (profile.has_strategy || profile.has_question_bank)) {
-          router.push("/course/learn");
+          /* Redirect to the first module they have access to */
+          if (profile.has_strategy) {
+            router.push("/course/learn?m=1&l=1");
+          } else {
+            router.push("/course/learn?m=6&l=1");
+          }
           return;
         }
       }
